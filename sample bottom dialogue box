@@ -1,0 +1,29 @@
+ fun exitorcontinue() {
+        val dialog = Dialog(this)
+        dialog.setCancelable(false)
+        dialog.setContentView(R.layout.db_exitdialogue)
+        dialog.getWindow()!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window!!.setGravity(Gravity.BOTTOM)
+        dialog.window!!.setLayout(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
+        val positive: Button = dialog.findViewById(R.id.btn_yes)
+        positive.setOnClickListener {
+            dialog.dismiss()
+        }
+        val negative: Button = dialog.findViewById(R.id.btn_exit)
+        negative.setOnClickListener {
+            finishAffinity()
+        }
+        val rateUs: ImageView =dialog.findViewById(R.id.btn_rate_us)
+        rateUs.setOnClickListener {
+            rateApp()
+            finishAffinity()
+        }
+        dialog.setOnCancelListener {
+            //dialogueClickListner.negativeHotSpotTurnOFF()
+            dialog.dismiss()
+        }
+        dialog.show()
+    }
