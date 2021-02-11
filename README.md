@@ -8,7 +8,7 @@
 
 function to call # rateApp
 
- private fun rateIntentForUrl(url: String): Intent? {
+**** private fun rateIntentForUrl(url: String): Intent? {
         var intent: Intent? = null
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             intent = Intent(
