@@ -1,0 +1,32 @@
+public void loadBannerAdd() {
+
+        AdView adView = new AdView(this, this.getResources().getString(R.string.banner_add), AdSize.BANNER_HEIGHT_50);
+
+        AdListener adListener = new AdListener() {
+
+            @Override
+            public void onError(Ad ad, AdError adError) {
+                Log.d("TAG", "onError: " + adError.getErrorMessage());
+            }
+
+            @Override
+            public void onAdLoaded(Ad ad) {
+
+            }
+
+            @Override
+            public void onAdClicked(Ad ad) {
+                adView.loadAd(adView.buildLoadAdConfig().withAdListener(this).build());
+            }
+
+            @Override
+            public void onLoggingImpression(Ad ad) {
+
+            }
+        };
+
+
+        adView.loadAd(adView.buildLoadAdConfig().withAdListener(adListener).build());
+        RelativeLayout relativeLayout = findViewById(R.id.mybanner);
+        relativeLayout.addView(adView);
+    }
