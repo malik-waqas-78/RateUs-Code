@@ -1,0 +1,319 @@
+package com.data.usage.manager.UsefullClasses
+
+import android.Manifest
+import android.app.Activity
+import android.content.Context
+import android.content.IntentSender.SendIntentException
+import android.content.pm.PackageManager
+import android.location.LocationManager
+import android.os.Build
+import android.os.Bundle
+import android.util.Log
+import androidx.core.app.ActivityCompat
+import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
+import androidx.core.content.ContextCompat
+import com.phoneclone.oldtonewphone.constants.Constants
+import com.google.android.gms.common.api.GoogleApiClient
+import com.google.android.gms.location.*
+import com.phoneclone.oldtonewphone.utills.MyDialogueBoxes
+
+
+class MyAppPermissions(var appContext: Context, var activityContext: Context) {
+    private var runTimePermissionsGiven=false
+
+
+
+//    lateinit var mySharedPreferences: MySharedPreferences
+    val accessFineLocation= Manifest.permission.ACCESS_FINE_LOCATION
+    val storageReadPermission= Manifest.permission.READ_EXTERNAL_STORAGE
+    val storageWritePermission=Manifest.permission.WRITE_EXTERNAL_STORAGE
+   /* private val cameraPermission= Manifest.permission.CAMERA*/
+    var permissions = arrayOf(
+        Manifest.permission.READ_CONTACTS,
+        Manifest.permission.WRITE_CONTACTS,
+        /*Manifest.permission.READ_CALL_LOG,
+        Manifest.permission.WRITE_CALL_LOG,*/
+        Manifest.permission.READ_CALENDAR,
+        Manifest.permission.WRITE_CALENDAR,
+    )
+
+    var splashPermissions= arrayOf(
+        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        accessFineLocation
+    )
+    init {
+//        mySharedPreferences= MySharedPreferences(appContext)
+    }
+//    fun requestForRunTimePermissions():Boolean{
+//
+//        if(mySharedPreferences.canAskForPermissions()){
+//            runTimePermissionsGiven= checkAndRequestRuntimePermissions()
+//            return runTimePermissionsGiven
+//        }
+//        return false;
+//    }
+//    fun checkAndRequestForSystemLevelPermissions() {
+//        if (!checkForSystemLevelPermission(activityContext)) {
+//            requestSystemLevelPermission()
+//        }
+//    }
+
+//    fun requestSystemLevelPermission() {
+//    }
+
+//    fun checkAndRequestForIgnoreBatteryOptimizationPermission(){
+//    if(!isIgnoringBatteryOptimization()){
+//            requestIgnoreBatteryOptimization();
+//        }
+//    }
+//    public fun isIgnoringBatteryOptimization():Boolean{
+//        val powerManager : PowerManager = appContext.getSystemService(Context.POWER_SERVICE) as PowerManager
+//        return powerManager.isIgnoringBatteryOptimizations(appContext.packageName)
+//    }
+
+
+    fun getSplashPermissions(){
+        if(!haveSplashPermissions()) {
+            if(Build.VERSION.SDK_INT>=23){
+                if((activityContext as Activity).shouldShowRequestPermissionRationale(accessFineLocation)){
+                    val myDialogueBoxes=MyDialogueBoxes(activityContext)
+                    val title=""" Allow "Phone Clone " to access your Location.""";
+                    val msg="This will allow us to search for near by devices that you want to connect to.";
+                    myDialogueBoxes.showRational(accessFineLocation,title,msg)
+                }else if((activityContext as Activity).shouldShowRequestPermissionRationale(storageWritePermission)){
+                    val myDialogueBoxes=MyDialogueBoxes(activityContext)
+                    val title="""Allow "Phone Clone " to access your media Files.""";
+                    val msg="This will allow us to share files between your new and old devices.";
+                    myDialogueBoxes.showRational(accessFineLocation,title,msg)
+                }else{
+                    requestSplashPermissions()
+                }
+            }else{
+                requestSplashPermissions()
+            }
+
+
+        }
+
+    }
+
+    fun haveSplashPermissions():Boolean{
+        var permissionsNotGranted = ArrayList<String>()
+
+        for (permission in splashPermissions) {
+            if (ContextCompat.checkSelfPermission(appContext, permission) != PackageManager.PERMISSION_GRANTED) {
+                permissionsNotGranted.add(permission);
+            }
+        }
+        permissionsNotGranted.toTypedArray()
+        if (!permissionsNotGranted.isEmpty()) {
+            return false
+        }
+        return true
+    }
+
+    fun requestSplashPermissions(){
+        var permissionsNotGranted = ArrayList<String>()
+        for (permission in splashPermissions) {
+            if (ContextCompat.checkSelfPermission(appContext, permission) != PackageManager.PERMISSION_GRANTED) {
+                permissionsNotGranted.add(permission);
+            }
+        }
+        permissionsNotGranted.toTypedArray()
+        if (!permissionsNotGranted.isEmpty()) {
+            ActivityCompat.requestPermissions(
+                activityContext as Activity, permissionsNotGranted.toTypedArray(),
+                Constants.PERMISSIONS_REQUSTCODE
+            )
+
+        }
+
+    }
+
+    fun requestRunTimePermissions(){
+        var deniedPermissions= ArrayList<String>()
+        if(Build.VERSION.SDK_INT>=23){
+            for(i in permissions){
+                if((activityContext as Activity).shouldShowRequestPermissionRationale(i)){
+                    val myDialogueBoxes=MyDialogueBoxes(activityContext)
+                    var title="";
+                    var msg="";
+                    if(i==permissions[0]||i==permissions[1]){
+                        title="""Allow "Phone Clone " to Read or Write Contacts.""";
+                        msg="This will allow us to read contacts from your old device and write them to your new device.";
+                    }else if(i==permissions[2]||i==permissions[3]){
+                        title="""Allow "Phone Clone " to Read or Write Call Logs.""";
+                        msg="This will allow us to read Call Logs from your old device and write them to your new Device.";
+                    }else if(i==permissions[5]||i==permissions[4]){
+                        title="""Allow "Phone Clone " to Read or Write Calendar.""";
+                        msg="This will allow us to read Calendar from your old device and write them to your new Device.";
+                    }
+                    myDialogueBoxes.showRational(accessFineLocation,title,msg)
+                    break
+                }else{
+                    if(ContextCompat.checkSelfPermission(appContext,i)!=PackageManager.PERMISSION_GRANTED){
+                        deniedPermissions.add(i)
+                    }
+                }
+            }
+        }else{
+            for(i in permissions){
+                if(ContextCompat.checkSelfPermission(appContext,i)!=PackageManager.PERMISSION_GRANTED){
+                    deniedPermissions.add(i)
+                }
+            }
+        }
+
+        if(deniedPermissions!=null&&deniedPermissions.isNotEmpty())
+
+        {
+            ActivityCompat.requestPermissions(
+                activityContext as Activity, deniedPermissions.toTypedArray(),
+                Constants.PERMISSIONS_REQUSTCODE
+            )
+        }}
+
+    private fun checkAndRequestRuntimePermissions() :Boolean{
+
+
+
+            var permissionsNotGranted = ArrayList<String>()
+
+            for (permission in permissions) {
+                if (ContextCompat.checkSelfPermission(
+                        appContext,
+                        permission
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    permissionsNotGranted.add(permission);
+                }
+            }
+            permissionsNotGranted.toTypedArray()
+            if (!permissionsNotGranted.isEmpty()) {
+                ActivityCompat.requestPermissions(
+                    activityContext as Activity, permissionsNotGranted.toTypedArray(),
+                    Constants.PERMISSIONS_REQUSTCODE
+                )
+                return false
+            }
+            return true
+        }
+
+
+    fun isRuntimePermissions():Boolean{
+//        val editor=mySharedPreferences.getPreferencesEditor()
+//
+        for (permission in permissions) {
+            if (ContextCompat.checkSelfPermission(appContext, permission) != PackageManager.PERMISSION_GRANTED) {
+                return false
+            }
+        }
+//            editor.putBoolean(Constants.ASK_FOR_PERMISSION,true)
+//            editor.commit()
+        return true
+    }
+
+    fun isRunTimePermissionsGiven() :Boolean{
+        runTimePermissionsGiven=checkAndRequestRuntimePermissions();
+        return runTimePermissionsGiven;
+    }
+
+    public fun isLocationPermissionGiven():Boolean{
+        return ContextCompat.checkSelfPermission(appContext, accessFineLocation)==PackageManager.PERMISSION_GRANTED
+    }
+    public fun shouldShowLocationRationals():Boolean{
+        return shouldShowRequestPermissionRationale(activityContext as Activity, accessFineLocation)
+    }
+    public fun requestLocationPermission(){
+        ActivityCompat.requestPermissions(
+            activityContext as Activity, arrayOf(accessFineLocation),
+            Constants.LOCATION_PERMISIION_REQUEST_CODE
+        )
+    }
+
+    public fun CheckIfGPSisOn():Boolean{
+        val lm = appContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        var gps_enabled = false
+        try{
+            if(Build.VERSION.SDK_INT>=28){
+                gps_enabled=lm.isLocationEnabled
+            }else
+                gps_enabled=lm.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        }catch (e: Exception){
+                //show msg exception
+        }
+        return gps_enabled;
+    }
+    public fun turnGpsOn(){
+        enableLoc()
+    }
+    private fun enableLoc() {
+        var googleApiClient:GoogleApiClient?=null
+        if (googleApiClient == null) {
+            googleApiClient = GoogleApiClient.Builder(appContext)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(object : GoogleApiClient.ConnectionCallbacks {
+                    override fun onConnected(bundle: Bundle?) {}
+                    override fun onConnectionSuspended(i: Int) {
+                        googleApiClient!!.connect()
+                    }
+                })
+                .addOnConnectionFailedListener { connectionResult ->
+                    Log.d(
+                        "Location error",
+                        "Location error " + connectionResult.errorCode
+                    )
+                }.build()
+            googleApiClient.connect()
+            val locationRequest = LocationRequest.create()
+            locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+            locationRequest.interval = (1000).toLong()
+            locationRequest.fastestInterval = (1000/2).toLong()
+            val builder = LocationSettingsRequest.Builder()
+                .addLocationRequest(locationRequest)
+            builder.setAlwaysShow(true)
+            val result =
+                LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build())
+            result.setResultCallback { result ->
+                val status = result.status
+                when (status.statusCode) {
+                    LocationSettingsStatusCodes.RESOLUTION_REQUIRED -> try {
+                        // Show the dialog by calling startResolutionForResult(),
+                        // and check the result in onActivityResult().
+                        status.startResolutionForResult(
+                            activityContext as Activity?,
+                            Constants.REQUEST_LOCATION_TURNON
+                        )
+                    } catch (e: SendIntentException) {
+                        // Ignore the error.
+                    }
+                }
+            }
+        }
+    }
+
+    fun isStoragePermissionGiven(): Boolean {
+
+        if (ContextCompat.checkSelfPermission(appContext, storageReadPermission) != PackageManager.PERMISSION_GRANTED&&
+            ContextCompat.checkSelfPermission(appContext, storageWritePermission) != PackageManager.PERMISSION_GRANTED ) {
+            return false
+        }
+        return true
+
+    }
+
+/*    public fun isCameraPermissionGiven():Boolean{
+        return ContextCompat.checkSelfPermission(appContext, cameraPermission)==PackageManager.PERMISSION_GRANTED
+    }
+    public fun shouldShowCameraRationals():Boolean{
+        return shouldShowRequestPermissionRationale(activityContext as Activity, cameraPermission)
+    }
+    public fun requestCameraPermission(){
+        ActivityCompat.requestPermissions(
+                activityContext as Activity, arrayOf(cameraPermission),
+                Constants.LOCATION_PERMISIION_REQUEST_CODE
+        )
+    }*/
+
+}
