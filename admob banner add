@@ -1,0 +1,46 @@
+ public void admobBanner() {
+
+        com.google.android.gms.ads.AdView mAdView = new com.google.android.gms.ads.AdView(SplashScreen.this);
+        com.google.android.gms.ads.AdSize adSize = IntersitialAdds.getAdSize(SplashScreen.this);
+        mAdView.setAdSize(adSize);
+
+        mAdView.setAdUnitId(getResources().getString(R.string.admob_banner));
+
+        com.google.android.gms.ads.AdRequest adRequest = new com.google.android.gms.ads.AdRequest.Builder().build();
+
+        final RelativeLayout adViewLayout = (RelativeLayout) findViewById(R.id.banner);
+        adViewLayout.addView(mAdView);
+
+        mAdView.loadAd(adRequest);
+
+        mAdView.setAdListener(new com.google.android.gms.ads.AdListener() {
+            @Override
+            public void onAdClosed() {
+                super.onAdClosed();
+            }
+
+            @Override
+            public void onAdFailedToLoad(int errorCode) {
+                super.onAdFailedToLoad(errorCode);
+                //adViewLayout.setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0));
+                adViewLayout.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onAdLeftApplication() {
+                super.onAdLeftApplication();
+            }
+
+            @Override
+            public void onAdOpened() {
+                super.onAdOpened();
+            }
+
+            @Override
+            public void onAdLoaded() {
+                super.onAdLoaded();
+                adViewLayout.setVisibility(View.VISIBLE);
+            }
+        });
+
+    }
