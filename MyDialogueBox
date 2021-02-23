@@ -163,7 +163,12 @@ class MyDialogueBoxes(var activity: Context) {
         }
         dialog.show()
     }
-
+    
+    
+// title="""Allow "Phone Clone " to Read or Write Contacts.""";
+  //                      msg="This will allow us to read contacts from your old device and write them to your new device.";
+  
+  
     fun showRational(permissionPermission:String,title:String,msg:String) {
         val dialog = Dialog(activity)
         dialog.setCancelable(false)
