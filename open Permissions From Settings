@@ -1,0 +1,14 @@
+  override fun allowPermission(permission: String) {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+        val uri: Uri = Uri.fromParts("package", packageName, null)
+        intent.data = uri
+        var requestCode=0
+        if(permission==myPermissions?.accessFineLocation){
+            requestCode=Constants.LOCATION_PERMISIION_REQUEST_CODE
+        }else if(permission==myPermissions?.storageReadPermission||permission==myPermissions?.storageWritePermission){
+            requestCode=Constants.STORAGE_PERMISSION
+        }else{
+            requestCode=2344
+        }
+        startActivityForResult(intent,requestCode)
+    }
