@@ -12,3 +12,7 @@
             app:lottie_loop="true"
             app:lottie_rawRes="@raw/tickanim"
             app:lottie_repeatCount="0" />
+
+
+def lottieVersion = "3.4.0" 
+implementation "com.airbnb.android:lottie:$lottieVersion"
