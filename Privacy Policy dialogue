@@ -1,3 +1,5 @@
+ put following strings inside string.xml file
+ 
  <string name="privacy_text">Privacy Policy</string>
     <string name="privacy_text1">These are the Terms of Service and Privacy Policy of This application. This application which provides you with the WhatsApp Data Recovery. This privacy policy provides an overview about how we process personal data about users of our mobile applications we provide to you.We will not share your personal information anyone excepts as described in the privacy policy </string>
     <string name="privacy_text2">Our Privacy Commitment</string>
@@ -15,6 +17,8 @@
     <string name="privacy_text14">If you have any questions about this Privacy Policy, please contact us:</string>
 
 
+
+//show this diaogue ion butn presson privay policy
 
     private void privacy_Dialog() {
         final Dialog dialog = new Dialog(SplashScreen.this, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
@@ -37,7 +41,7 @@
 
 
 
-
+//layout of dialogue
 
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
